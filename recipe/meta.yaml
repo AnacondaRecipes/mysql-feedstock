@@ -9,7 +9,7 @@ package:
   version: {{ major_minor_version }}.{{ micro_version }}
 
 source:
-  - url: https://cdn.mysql.com/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
+  - url: https://dev.mysql.com/get/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
     sha256: {{ sha256 }}
     patches:
       - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
