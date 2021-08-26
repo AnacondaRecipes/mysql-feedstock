@@ -13,7 +13,7 @@ source:
     sha256: {{ sha256 }}
     patches:
       - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
-
+      - fix_osx11sdk.patch
 build:
   number: 0
   skip: True  # [win]
@@ -23,14 +23,14 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake
+    - ninja
     - make
     - perl
-    - patchelf
+    - patchelf  # [not osx]
   host:
     - libedit
     - openssl
     - cyrus-sasl  # [not win]
-
 test:
   commands:
     - mysql_config --version
