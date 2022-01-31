@@ -27,7 +27,9 @@ requirements:
     - make
     - perl
     - patchelf  # [not osx]
-  host:
+    - patch       # [not win]
+    - m2-patch    # [win]
+   host:
     - libedit
     - openssl
     - cyrus-sasl  # [not win]
