@@ -29,7 +29,7 @@ requirements:
     - patchelf  # [not osx]
     - patch       # [not win]
     - m2-patch    # [win]
-   host:
+  host:
     - libedit
     - openssl
     - cyrus-sasl  # [not win]
