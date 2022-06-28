@@ -31,7 +31,7 @@ source:
 
 build:
   number: 1
-  # trigger: 1
+  # trigger: 0
   skip:  True  # [linux and (s390x or ppc64le)]
 
 requirements:
