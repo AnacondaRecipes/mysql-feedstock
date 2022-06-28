@@ -48,6 +48,7 @@ requirements:
     - patch                    # [unix]
 
   host:
+    - libaio                   # [linux]
     - cyrus-sasl               # [unix]
     - icu
     - libedit                  # [unix]
