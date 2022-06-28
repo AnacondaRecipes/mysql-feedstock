@@ -15,8 +15,8 @@ source:
       - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
       - fix_osx11sdk.patch
 build:
-  number: 0
-  skip: True  # [win]
+  number: 1
+  skip: True  # [win or s390x]
 
 requirements:
   build:
