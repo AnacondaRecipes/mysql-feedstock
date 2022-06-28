@@ -38,7 +38,7 @@ EOF
 fi
 
 declare -a _xtra_cmake_args
-if [[ $target_platform == osx-64 ]]; then
+if [[ $target_platform == osx-* ]]; then
     _xtra_cmake_args+=(-DWITH_ROUTER=OFF)
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
 fi
@@ -95,7 +95,7 @@ cmake -S$SRC_DIR -Bbuild -GNinja \
   -DCMAKE_CXX_STANDARD=17 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
-  -DCOMPILATION_COMMENT=conda-forge \
+  -DCOMPILATION_COMMENT=anaconda \
   -DCMAKE_FIND_FRAMEWORK=LAST \
   -DWITH_UNIT_TESTS=OFF \
   -DWITH_SASL=system \
