@@ -74,6 +74,7 @@ outputs:
       # Used only for lber.h, no library needed at runtime
       ignore_run_exports:
         - openldap
+        - cyrus-sasl  # [unix]
     requirements:
       build:
         - {{ compiler('cxx') }}
