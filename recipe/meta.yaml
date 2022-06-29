@@ -76,7 +76,7 @@ outputs:
       ignore_run_exports:
         - openldap
         - cyrus-sasl  # [unix]
-        - acports-legacy-support  # [osx and arm64]
+        - macports-legacy-support  # [osx and arm64]
     requirements:
       build:
         - {{ compiler('cxx') }}
