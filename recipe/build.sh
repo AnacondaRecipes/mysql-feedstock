@@ -8,7 +8,10 @@ _rpcgen_hack_dir=$SRC_DIR/rpcgen_hack
 declare -a CMAKE_PLATFORM_FLAGS
 if [[ "${target_platform}" == *"linux"* ]]; then
     CMAKE_PLATFORM_FLAGS+=(-DCMAKE_FIND_ROOT_PATH="${PREFIX};${BUILD_PREFIX}/${HOST}/sysroot")
-    ## We don't have a conda package for rpcgen, but it is present in the
+CMAKE_PLATFORM_FLAGS+=(-DCMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES:PATH="${BUILD_PREFIX}/${HOST}/sysroot/usr/include")
+export LD_LIBRARY_PATH="${BUILD_PREFIX}/${HOST}/sysroot/usr/lib64"
+
+    # #We don't have a conda package for rpcgen, but it is present in the
     ## compiler sysroot on Linux. However, the value of PT_INTERP is not
     ## convenient for executing it. ('lib' instead of 'lib64')
     _target_sysroot=$(${CXX_FOR_BUILD:-$CC} --print-sysroot)
@@ -94,7 +97,7 @@ if [[ $target_platform == osx-arm64 ]]; then
 fi
 
 cmake -S$SRC_DIR -Bbuild -GNinja \
-  ${CMAKE_PLATFORM_FLAGS} \
+  "${CMAKE_PLATFORM_FLAGS[@]}" \
   -DCMAKE_CXX_STANDARD=17 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
