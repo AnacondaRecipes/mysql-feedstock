@@ -49,7 +49,7 @@ requirements:
     - {{ cdt('numactl-devel') }}  # [linux and aarch64]
 
   host:
-    - libaio                   # [linux]
+    - libaio                   # [linux and aarch64]
     - cyrus-sasl               # [unix]
     - icu
     - libedit                  # [unix]
