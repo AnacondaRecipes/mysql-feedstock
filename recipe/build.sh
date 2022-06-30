@@ -99,7 +99,7 @@ fi
 
 cmake -S$SRC_DIR -Bbuild -GNinja \
   "${CMAKE_PLATFORM_FLAGS[@]}" \
-  -DCMAKE_CXX_STANDARD=17 \
+  -DCMAKE_CXX_STANDARD=11 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
   -DCOMPILATION_COMMENT=anaconda \
