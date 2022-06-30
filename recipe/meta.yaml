@@ -47,6 +47,7 @@ requirements:
     - m2-patch                 # [win]
     - patch                    # [unix]
     - {{ cdt('numactl-devel') }}  # [linux and aarch64]
+    - pkg-config
 
   host:
     - libaio                   # [linux and aarch64]
