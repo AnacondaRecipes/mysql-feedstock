@@ -1,0 +1,6 @@
+c_compiler:            # [win]
+  - vs2019             # [win]
+cxx_compiler:          # [win]
+  - vs2019             # [win]
+cyrus_sasl:
+  - 2.1.27
