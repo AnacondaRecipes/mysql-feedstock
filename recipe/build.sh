@@ -49,7 +49,7 @@ if [[ $target_platform == osx-64 ]]; then
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
 fi
 
-# if [[ $target_platform == osx-arm64 ]] ; then
+if [[ $target_platform == osx-arm64 ]] ; then
     # Build all intermediate codegen binaries for the build platform
     # xref: https://cmake.org/pipermail/cmake/2013-January/053252.html
     env -u SDKROOT -u CONDA_BUILD_SYSROOT -u CMAKE_PREFIX_PATH \
@@ -95,7 +95,7 @@ fi
 
     ## Use the protoc from the build platform as it needs to be exec'd
     _xtra_cmake_args+=(-DProtobuf_PROTOC_EXECUTABLE=$BUILD_PREFIX/bin/protoc)
-# fi
+fi
 
 cmake -S$SRC_DIR -Bbuild -GNinja \
   "${CMAKE_PLATFORM_FLAGS[@]}" \
