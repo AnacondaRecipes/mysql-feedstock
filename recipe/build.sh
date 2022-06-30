@@ -9,7 +9,8 @@ declare -a CMAKE_PLATFORM_FLAGS
 if [[ "${target_platform}" == *"linux"* ]]; then
     CMAKE_PLATFORM_FLAGS+=(-DCMAKE_FIND_ROOT_PATH="${PREFIX};${BUILD_PREFIX}/${HOST}/sysroot")
 CMAKE_PLATFORM_FLAGS+=(-DCMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES:PATH="${BUILD_PREFIX}/${HOST}/sysroot/usr/include")
-export LD_LIBRARY_PATH="${BUILD_PREFIX}/${HOST}/sysroot/usr/lib64"
+    export CFLAGS="${CFLAGS} -L{BUILD_PREFIX}/${HOST}/sysroot/usr/lib64"
+    export CXXFLAGS="${CXXFLAGS} -L{BUILD_PREFIX}/${HOST}/sysroot/usr/lib64"
 
     # #We don't have a conda package for rpcgen, but it is present in the
     ## compiler sysroot on Linux. However, the value of PT_INTERP is not
@@ -43,7 +44,7 @@ EOF
 fi
 
 declare -a _xtra_cmake_args
-if [[ $target_platform == osx-* ]]; then
+if [[ $target_platform == osx-64 ]]; then
     _xtra_cmake_args+=(-DWITH_ROUTER=OFF)
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
 fi
