@@ -9,8 +9,8 @@ package:
   version: {{ version }}
 
 source:
-  - url: https://dev.mysql.com/get/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
-    sha256: {{ sha256 }}
+  url: https://dev.mysql.com/get/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
+  sha256: {{ sha256 }}
   patches:
     - patches/0001-Make-installation-of-pdb-files-optional.patch
     - patches/0002-Fix-file-path-for-mysqlrouter.conf.sample-for-instal.patch
@@ -95,7 +95,6 @@ outputs:
       license_file: LICENSE
       summary: Database server and related tools
 
-
   - name: mysql-client
     build:
       script:
@@ -122,7 +121,6 @@ outputs:
     about:
       license_file: LICENSE
       summary: MySQL client applications and tools
-
 
   - name: mysql-devel
     build:
@@ -157,7 +155,6 @@ outputs:
       license_file: LICENSE
       summary: Development header files and libraries for MySQL database client applications
 
-
   - name: mysql-libs
     build:
       script:
@@ -183,7 +180,6 @@ outputs:
     about:
       license_file: LICENSE
       summary: Shared libraries for MySQL database client applications
-
 
   - name: mysql-common
     build:
@@ -238,7 +234,6 @@ outputs:
       license_file: LICENSE
       summary: MySQL Router binaries
 
-
   - name: mysql
     build:
       script:
@@ -288,7 +283,6 @@ about:
     and robust SQL (Structured Query Language) database server. MySQL Server
     is intended for mission-critical, heavy-load production systems as well
     as for embedding into mass-deployed software.
-
 
 extra:
   recipe-maintainers:
