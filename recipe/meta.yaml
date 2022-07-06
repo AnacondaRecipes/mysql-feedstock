@@ -1,58 +1,297 @@
 {% set name = "mysql" %}
-{% set major_minor_version = "5.7" %}
-{% set micro_version = "24" %}
+{% set major_minor_version = "8.0" %}
+{% set micro_version = "29" %}
 {% set sha256 = "b980dced9c9eb3385cca44870facc220504ca011196c5a19c2bfe43d3f5d6212" %}
 {% set sha256_boost = "47f11c8844e579d02691a607fbd32540104a9ac7a2534a8ddaef50daf502baac" %}
 
 package:
-  name: {{ name|lower }}
-  version: {{ major_minor_version }}.{{ micro_version }}
+  name: mysql-suite
+  version: {{ version }}
 
 source:
   - url: https://dev.mysql.com/get/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
     sha256: {{ sha256 }}
-    patches:
-      - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
-      - fix_osx11sdk.patch
+  patches:
+    - patches/0001-Make-installation-of-pdb-files-optional.patch
+    - patches/0002-Fix-file-path-for-mysqlrouter.conf.sample-for-instal.patch
+    - patches/0003-Allow-flags-other-than-macros-in-CPPFLAGS.patch
+    - patches/0004-Add-include-header-for-std-string.patch
+    - patches/0005-Use-macports-legacy-support-for-features-10.9.patch
+    - patches/0006-Remove-forceful-injection-of-debug-info.patch
+    - patches/0007-Link-libgcc-libstdc-statically-for-codgen-binaries.patch
+    - patches/0008-Make-LIBEVENT_PTHREADS-conditional-on-CMAKE_USE_PTHR.patch
+    - patches/0009-Add-dependency-on-comp_err-iff-that-target-exists.patch
+    - patches/0010-Add-constructor-for-ut-Location.patch
+    - patches/0011-Reduce-number-of-symbols-being-exported-from-mysqld..patch
+    - patches/0012-Ensure-sql_main-uses-protobuf-shared-library-correct.patch
+    - patches/0013-Include-missing-header-for-std-isdigit.patch
+    - patches/0014-Add-bitset-typecasts-to-make-MSVC-v19.20-happy.patch
+    - patches/0015-Print-number-of-lines-in-the-file-generated-by-creat.patch
+    - patches/0016-Check-for-ARMv8-crc32-intrinsic-support-on-osx-arm64.patch
+    - patches/0017-Add-workaround-for-a-bug-in-GCC-v9.4.0-aarch64.patch
+    - patches/0018-Revert-Bug-30981914-COMPILE-WITH-FASTER-TLS-MODEL.patch
+    # https://code.launchpad.net/~racb/ubuntu/+source/mysql-8.0/+git/mysql-8.0/+merge/414742
+    - patches/0019-Add-support-for-OpenSSL-3.0.patch
+
 build:
   number: 0
-  skip: True  # [win]
 
 requirements:
   build:
-    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake
     - ninja
-    - make
-    - perl
-    - patchelf  # [not osx]
-    - patch       # [not win]
-    - m2-patch    # [win]
+    - protobuf
   host:
-    - libedit
+    - cyrus-sasl               # [unix]
+    - icu
+    - libedit                  # [unix]
+    - libevent
+    - libprotobuf
+    - lz4-c
+    - macports-legacy-support  # [osx]
+    - openldap                 # [unix]
     - openssl
-    - cyrus-sasl  # [not win]
-test:
-  commands:
-    - mysql_config --version
-    - my_print_defaults --version
-    - mysqld --help --verbose
-    - command -v mysql.server
+    - zlib
+    - zstd
+
+outputs:
+  - name: mysql-server
+    build:
+      script:
+        - cmake -DCOMPONENT=Server -P ${SRC_DIR}/build/cmake_install.cmake             # [unix]
+        - cmake -DCOMPONENT=Server_Scripts -P ${SRC_DIR}/build/cmake_install.cmake     # [unix]
+        - ln -s ${PREFIX}/mysql/support-files/mysql.server ${PREFIX}/bin/mysql.server  # [unix]
+        - cmake -DCOMPONENT=Server -P %SRC_DIR%\build\cmake_install.cmake              # [win]
+        - cmake -DCOMPONENT=Server_Scripts -P %SRC_DIR%\build\cmake_install.cmake      # [win]
+      # Used only for lber.h, no library needed at runtime
+      ignore_run_exports:
+        - openldap
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        - cyrus-sasl               # [unix]
+        - icu
+        - libevent
+        - libprotobuf
+        - lz4-c
+        - macports-legacy-support  # [osx]
+        - openldap                 # [unix]
+        - openssl
+        - zlib
+        - zstd
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - mysqld --version
+        - test -f ${PREFIX}/lib/plugin/mysql_no_login.so               # [unix]
+        - if not exist %LIBRARY_LIB%\plugin\mysql_no_login.dll exit 1  # [win]
+    about:
+      license_file: LICENSE
+      summary: Database server and related tools
+
+
+  - name: mysql-client
+    build:
+      script:
+        - cmake -DCOMPONENT=Client -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
+        - cmake -DCOMPONENT=Client -P %SRC_DIR%\build\cmake_install.cmake   # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        - libedit  # [unix]
+        - lz4-c
+        - openssl
+        - zlib
+        - zstd
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - mysql --version
+        - mysqldump --version
+    about:
+      license_file: LICENSE
+      summary: MySQL client applications and tools
+
+
+  - name: mysql-devel
+    build:
+      script:
+        - cmake -DCOMPONENT=Development -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
+        - cmake -DCOMPONENT=Development -P %SRC_DIR%\build\cmake_install.cmake   # [win]
+      run_exports:
+        # https://mysqlserverteam.com/the-client-library-part-2-the-version-number/
+        - {{ pin_subpackage('mysql-libs', max_pin='x.x') }}
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        # 2022/03/20 hmaarrfk
+        # Add openssl to ensure a unique build number fo mysql-devel
+        - openssl
+        - {{ pin_subpackage('mysql-libs', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-libs', exact=True) }}
+    test:
+      commands:
+        - test -f $PREFIX/include/mysql/mysql.h                     # [unix]
+        - test -f $PREFIX/include/mysql/mysqlx_version.h            # [unix]
+        - test -f $PREFIX/lib/pkgconfig/mysqlclient.pc              # [unix]
+        - if not exist %LIBRARY_INC%\mysql\mysql.h exit 1           # [win]
+        - if not exist %LIBRARY_INC%\mysql\mysqlx_version.h exit 1  # [win]
+        - if not exist %LIBRARY_LIB%\mysqlclient.lib exit 1         # [win]
+        - mysql_config --version                                    # [unix]
+    about:
+      license_file: LICENSE
+      summary: Development header files and libraries for MySQL database client applications
+
+
+  - name: mysql-libs
+    build:
+      script:
+        - cmake -DCOMPONENT=SharedLibraries -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
+        - cmake -DCOMPONENT=SharedLibraries -P %SRC_DIR%/build/cmake_install.cmake   # [win]
+        - move %LIBRARY_LIB%\*.dll %LIBRARY_BIN%\                                    # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        - openssl
+        - zlib
+        - zstd
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - test -f ${PREFIX}/lib/libmysqlclient${SHLIB_EXT}      # [unix]
+        - if not exist %LIBRARY_BIN%\libmysql.dll exit 1        # [win]
+    about:
+      license_file: LICENSE
+      summary: Shared libraries for MySQL database client applications
+
+
+  - name: mysql-common
+    build:
+      script:
+        - cmake -P ${SRC_DIR}/build/share/cmake_install.cmake  # [unix]
+        - cmake -P %SRC_DIR%\build\share\cmake_install.cmake   # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        # 2022/03/20 hmaarrfk
+        # Add openssl to ensure a unique build number fo mysql-devel
+        - openssl
+    test:
+      commands:
+        - test -f $PREFIX/share/mysql/english/errmsg.sys  # [unix]
+        - test -f $PREFIX/share/mysql/charsets/ascii.xml  # [unix]
+        - if not exist %LIBRARY_PREFIX%\share\mysql\english\errmsg.sys exit 1  # [win]
+        - if not exist %LIBRARY_PREFIX%\share\mysql\charsets\ascii.xml exit 1  # [win]
+    about:
+      license_file: LICENSE
+      summary: Common files for server and client libraries
+
+  - name: mysql-router
+    build:
+      # Requires macOS >=10.12
+      skip: true  # [osx]
+      script:
+        - cmake -DCOMPONENT=Router -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
+        - cmake -DCOMPONENT=Router -P %SRC_DIR%\build\cmake_install.cmake   # [win]
+        - move %LIBRARY_LIB%\*.dll %LIBRARY_BIN%\                           # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        - libevent
+        - libprotobuf
+        - lz4-c
+        - openssl
+        - zlib
+        - zstd
+    test:
+      commands:
+        - mysqlrouter --version
+        - test -f $PREFIX/lib/mysqlrouter/http_auth_backend.so   # [unix]
+        - test -f %LIBRARY_PREFIX%\bin\mysqlrouter_http.dll      # [win]
+    about:
+      license_file: LICENSE
+      summary: MySQL Router binaries
+
+
+  - name: mysql
+    build:
+      script:
+        - cmake -DCOMPONENT=Documentation -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
+        - cmake -DCOMPONENT=Info -P ${SRC_DIR}/build/cmake_install.cmake           # [unix]
+        - cmake -DCOMPONENT=ManPages -P ${SRC_DIR}/build/cmake_install.cmake       # [unix]
+        - cmake -DCOMPONENT=Readme -P ${SRC_DIR}/build/cmake_install.cmake         # [unix]
+        - cmake -DCOMPONENT=SupportFiles -P ${SRC_DIR}/build/cmake_install.cmake   # [unix]
+        - cmake -DCOMPONENT=Documentation -P %SRC_DIR%\build\cmake_install.cmake   # [win]
+        - cmake -DCOMPONENT=Info -P %SRC_DIR%\build\cmake_install.cmake            # [win]
+        - cmake -DCOMPONENT=Readme -P %SRC_DIR%\build\cmake_install.cmake          # [win]
+        - cmake -DCOMPONENT=SupportFiles -P %SRC_DIR%\build\cmake_install.cmake    # [win]
+    requirements:
+      build:
+        - cmake
+        - ninja
+      host:
+        # 2022/03/20 hmaarrfk
+        # Add openssl to ensure a unique build number fo mysql-devel
+        - openssl
+      run:
+        - {{ pin_subpackage('mysql-server', exact=True) }}
+        - {{ pin_subpackage('mysql-client', exact=True) }}
+        - {{ pin_subpackage('mysql-devel', exact=True) }}
+        - {{ pin_subpackage('mysql-libs', exact=True) }}
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - test -f $PREFIX/share/man/man1/mysql.1   # [unix]
+        - test -f $PREFIX/share/man/man8/mysqld.8  # [unix]
+        - mysql_config --version                   # [unix]
+        - my_print_defaults --version
+        - mysqld --help --verbose
+        - command -v mysql.server                  # [unix]
+    about:
+      license_file: LICENSE
+      summary: Meta package for backwards compat + bonus content
 
 about:
   home: https://www.mysql.com/
-  license: GPL-2.0
+  license: GPL-2.0-or-later
   license_family: GPL
-  license_file: COPYING
-  summary: 'Open source relational database management system.'
+  license_file: LICENSE
+  summary: Open source relational database management system.
   description: |
     The MySQL(TM) software delivers a very fast, multi-threaded, multi-user,
     and robust SQL (Structured Query Language) database server. MySQL Server
     is intended for mission-critical, heavy-load production systems as well
     as for embedding into mass-deployed software.
 
+
 extra:
   recipe-maintainers:
     - beckermr
     - mingwandroid
+    - nehaljwani
