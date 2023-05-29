@@ -69,7 +69,7 @@ cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DCOMPILATION_COMMENT=conda-forge \
   -DWITH_SSL=system \
   -DWITH_EDITLINE=system \
-  -DDOWNLOAD_BOOST=1 -DWITH_BOOST=${SRC_DIR}/boost \
+  -DDOWNLOAD_BOOST=0 -DWITH_BOOST=${SRC_DIR}/boost \
   -DINSTALL_INCLUDEDIR=include/mysql \
   -DINSTALL_MANDIR=share/man \
   -DINSTALL_DOCDIR=share/doc/mysql \

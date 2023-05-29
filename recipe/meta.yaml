@@ -14,6 +14,7 @@ source:
       - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
       - fix_osx11sdk.patch
       - openssl3.patch
+      - find-boost.patch
 build:
   number: 1
   # linux-s390x is skipped because cyrus-sasl isn't available on s390x
