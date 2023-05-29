@@ -1,14 +1,14 @@
 {% set name = "mysql" %}
-{% set major_minor_version = "5.7" %}
-{% set micro_version = "24" %}
+{% set version = "5.7.24" %}
 {% set sha256 = "b980dced9c9eb3385cca44870facc220504ca011196c5a19c2bfe43d3f5d6212" %}
 
 package:
   name: {{ name|lower }}
-  version: {{ major_minor_version }}.{{ micro_version }}
+  version: {{ version }}
 
 source:
-  - url: https://dev.mysql.com/get/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
+  # - url: https://dev.mysql.com/get/Downloads/MySQL-{{ major_minor_version }}/mysql-boost-{{ major_minor_version }}.{{ micro_version }}.tar.gz
+  - url: https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-{{ version }}.tar.gz
     sha256: {{ sha256 }}
     patches:
       - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
