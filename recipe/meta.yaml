@@ -16,7 +16,8 @@ source:
       - openssl3.patch
 build:
   number: 1
-  skip: True  # [win]
+  # linux-s390x is skipped because cyrus-sasl isn't available on s390x
+  skip: True  # [win or (linux and s390x)]
 
 requirements:
   build:
