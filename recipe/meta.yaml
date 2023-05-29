@@ -2,7 +2,6 @@
 {% set major_minor_version = "5.7" %}
 {% set micro_version = "24" %}
 {% set sha256 = "b980dced9c9eb3385cca44870facc220504ca011196c5a19c2bfe43d3f5d6212" %}
-{% set sha256_boost = "47f11c8844e579d02691a607fbd32540104a9ac7a2534a8ddaef50daf502baac" %}
 
 package:
   name: {{ name|lower }}
@@ -15,7 +14,7 @@ source:
       - 0001-Split-ENV_CPPFLAGS-into-separate-arguments.patch
       - fix_osx11sdk.patch
 build:
-  number: 0
+  number: 1
   skip: True  # [win]
 
 requirements:
@@ -30,9 +29,11 @@ requirements:
     - patch       # [not win]
     - m2-patch    # [win]
   host:
-    - libedit
-    - openssl
-    - cyrus-sasl  # [not win]
+    - libedit 3.1.20221030
+    - openssl {{ openssl }}
+    - cyrus-sasl 2.1.28  # [not win]
+  run:
+    - openssl 3.*
 test:
   commands:
     - mysql_config --version
@@ -51,6 +52,9 @@ about:
     and robust SQL (Structured Query Language) database server. MySQL Server
     is intended for mission-critical, heavy-load production systems as well
     as for embedding into mass-deployed software.
+  documentation: https://dev.mysql.com/doc/
+  doc_url: https://dev.mysql.com/doc/refman/5.7/en/
+  dev_url: https://dev.mysql.com/doc/refman/5.7/en/
 
 extra:
   recipe-maintainers:
