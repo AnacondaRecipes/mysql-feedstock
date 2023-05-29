@@ -49,6 +49,8 @@ if [[ $target_platform == osx-64 ]]; then
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
 fi
 
+export CXXFLAGS="${CXXFLAGS} -std=c++14"
+
 cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
