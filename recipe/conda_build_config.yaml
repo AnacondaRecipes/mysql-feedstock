@@ -1,5 +1,0 @@
-# rpcgen crashes when using 11.2
-c_compiler_version:  # [linux and aarch64]
-  - '10.2'   # [linux and aarch64]
-cxx_compiler_version:  # [linux and aarch64]
-  - '10.2'   # [linux and aarch64]
