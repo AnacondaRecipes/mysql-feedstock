@@ -15,10 +15,10 @@ if [[ "${target_platform}" == *"linux"* ]]; then
     ## We don't have a conda package for rpcgen, but it is present in the
     ## compiler sysroot on Linux. However, the value of PT_INTERP is not
     ## convenient for executing it. ('lib' instead of 'lib64')
-    _target_sysroot=$($CXX --print-sysroot)
+    _target_sysroot=$(realpath $($CXX --print-sysroot))
     _target_rpcgen_bin=${_target_sysroot}/usr/bin/rpcgen
-    _target_interpreter=${_target_sysroot}/$(patchelf --print-interpreter ${_target_rpcgen_bin})
-    _target_libdir=${_target_sysroot}/$(dirname ${_target_interpreter})
+    _target_interpreter=$(realpath ${_target_sysroot}/$(patchelf --print-interpreter ${_target_rpcgen_bin}))
+    _target_libdir=${_target_sysroot}/$(dirname ${_target_interpreter} | rev | cut -d '/' -f 1 | rev)
 
     ## Generate a wrapper which will use the interpreter provided in the
     ## compiler sysroot to exec rpcgen and also provide the appropriate
@@ -49,6 +49,8 @@ if [[ $target_platform == osx-64 ]]; then
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
 fi
 
+export CXXFLAGS="${CXXFLAGS} -std=c++14"
+
 cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
@@ -69,7 +71,7 @@ cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DCOMPILATION_COMMENT=conda-forge \
   -DWITH_SSL=system \
   -DWITH_EDITLINE=system \
-  -DDOWNLOAD_BOOST=1 -DWITH_BOOST=${SRC_DIR}/boost \
+  -DDOWNLOAD_BOOST=0 -DWITH_BOOST=${SRC_DIR}/boost \
   -DINSTALL_INCLUDEDIR=include/mysql \
   -DINSTALL_MANDIR=share/man \
   -DINSTALL_DOCDIR=share/doc/mysql \
