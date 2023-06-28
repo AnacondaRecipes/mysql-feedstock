@@ -16,7 +16,7 @@ source:
       - openssl3.patch
       - find-boost.patch
 build:
-  number: 1
+  number: 2
   # linux-s390x is skipped because cyrus-sasl isn't available on s390x
   skip: True  # [win or (linux and s390x)]
 
@@ -36,7 +36,7 @@ requirements:
     - openssl {{ openssl }}
     - cyrus-sasl 2.1.28  # [not win]
   run:
-    - openssl 3.*
+    - openssl  # exact pin handled through openssl run_exports
 test:
   commands:
     - mysql_config --version
