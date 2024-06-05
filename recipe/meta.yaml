@@ -46,7 +46,7 @@ test:
 
 about:
   home: https://www.mysql.com/
-  license: GPL-2.0
+  license: GPL-2.0-only
   license_family: GPL
   license_file: LICENSE
   summary: Open source relational database management system.
