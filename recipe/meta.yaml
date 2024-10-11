@@ -1,5 +1,5 @@
 {% set major_minor_version = "8.4" %}
-{% set micro_version = "0" %}
+{% set micro_version = "2" %}
 {% set version = major_minor_version + "." + micro_version %}
 
 package:
@@ -8,30 +8,30 @@ package:
 
 source:
   - url: https://cdn.mysql.com/Downloads/MySQL-{{ major_minor_version }}/mysql-{{ version }}.tar.gz
-    sha256: 47a5433fcdd639db836b99e1b5459c2b813cbdad23ff2b5dd4ad27f792ba918e
+    sha256: 5657a78dc86bf0bf2227e0b05f8de5a2c447a816a112ffa26fa70083bcbe9814
     patches:
       - 0001-Allow-flags-other-than-macros-in-CPPFLAGS.patch
       - 0024-Link-to-absl_spinlock_wait.patch
 
 build:
-  number: 1
-  skip: True # [win]
+  number: 0
+  skip: True  # [win]
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - patch    # [not win]
-    - m2-patch # [win]
-    - patchelf # [linux]
+    - patch     # [not win]
+    - m2-patch  # [win]
+    - patchelf  # [linux]
     - cmake
     - ninja
-    - bison    # [unix]
+    - bison     # [unix]
     - pkg-config
 
   host:
     - icu {{ icu }}
-    - libcurl 8.7.1
+    - libcurl 8.9.1
     - libedit 3.1.20230828 # [unix]
     - libprotobuf {{ libprotobuf }}
     - libabseil {{ libabseil }}
