@@ -1,5 +1,5 @@
 {% set major_minor_version = "8.4" %}
-{% set micro_version = "2" %}
+{% set micro_version = "3" %}
 {% set version = major_minor_version + "." + micro_version %}
 
 package:
@@ -8,7 +8,7 @@ package:
 
 source:
   - url: https://cdn.mysql.com/Downloads/MySQL-{{ major_minor_version }}/mysql-{{ version }}.tar.gz
-    sha256: 5657a78dc86bf0bf2227e0b05f8de5a2c447a816a112ffa26fa70083bcbe9814
+    sha256: 7ac9564c478022f73005ff89bbb40f67b381fc06d5518416bdffec75e625b818
     patches:
       - 0001-Allow-flags-other-than-macros-in-CPPFLAGS.patch
       - 0024-Link-to-absl_spinlock_wait.patch
