@@ -33,6 +33,9 @@ EOF
     chmod +x ${_rpcgen_hack_dir}/bin/{rpcgen,cpp}
 
 elif [[ "${target_platform}" == *"osx"* ]]; then
+    # Remove explicitly ' -std=c++17' because CXXFLAGS already has -std=c++20 on osx platforms,
+    # c++20 is already by default from v8.3.0, see https://github.com/mysql/mysql-server/blob/mysql-8.4.3/cmake/build_configurations/compiler_options.cmake#L65C39-L65C49
+    export CXXFLAGS="${CXXFLAGS/ -std=c++17/}"
     ## Unlink GNU Compilers, Clang doesn't provide a separate binary
     ## for pre processing. So we trick rpcgen to use our Clang instead.
     mkdir -p $_rpcgen_hack_dir/bin

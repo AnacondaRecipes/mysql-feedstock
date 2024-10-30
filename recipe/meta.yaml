@@ -16,6 +16,8 @@ source:
 build:
   number: 0
   skip: True  # [win]
+  missing_dso_whitelist:                                    # [linux]
+    - $PREFIX/lib/libabsl_log_internal_message.so.2401.0.0  # [linux]
 
 requirements:
   build:
