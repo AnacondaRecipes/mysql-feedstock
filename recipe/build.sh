@@ -6,6 +6,9 @@ set -x
 _rpcgen_hack_dir=$SRC_DIR/rpcgen_hack
 
 if [[ "${target_platform}" == *"linux"* ]]; then
+    # absl_log_internal_message is missing on linux
+    export LDFLAGS="${LDFLAGS} -labsl_log_internal_message"
+    
     ## We don't have a conda package for rpcgen, but it is present in the
     ## compiler sysroot on Linux. However, the value of PT_INTERP is not
     ## convenient for executing it. ('lib' instead of 'lib64')
