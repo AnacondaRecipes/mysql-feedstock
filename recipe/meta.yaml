@@ -11,6 +11,7 @@ source:
     sha256: 47a5433fcdd639db836b99e1b5459c2b813cbdad23ff2b5dd4ad27f792ba918e
     patches:
       - 0001-Allow-flags-other-than-macros-in-CPPFLAGS.patch
+      - 0002-Use-new-protobuf-methods.patch
       - 0024-Link-to-absl_spinlock_wait.patch
 
 build:
