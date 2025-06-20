@@ -1,0 +1,40 @@
+From cb436cd4cca65395af20f47df5958f875f7714d5 Mon Sep 17 00:00:00 2001
+From: Nehal J Wani <nehaljw.kkd1@gmail.com>
+Date: Sun, 21 Jun 2020 13:06:08 -0400
+Subject: [PATCH 01/23] Make installation of pdb files optional
+
+---
+ cmake/install_macros.cmake | 2 +-
+ router/cmake/Plugin.cmake  | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/install_macros.cmake b/cmake/install_macros.cmake
+index 7fb74c7406d..b53082377ee 100644
+--- a/cmake/install_macros.cmake
++++ b/cmake/install_macros.cmake
+@@ -47,7 +47,7 @@ MACRO(INSTALL_DEBUG_SYMBOLS target)
+     # No .pdb file for static libraries.
+     IF(NOT type MATCHES "STATIC_LIBRARY")
+       INSTALL(FILES $<TARGET_PDB_FILE:${target}>
+-        DESTINATION ${INSTALL_LOCATION} COMPONENT ${comp})
++        DESTINATION ${INSTALL_LOCATION} COMPONENT ${comp} OPTIONAL)
+     ENDIF()
+   ENDIF()
+ ENDMACRO()
+diff --git a/router/cmake/Plugin.cmake b/router/cmake/Plugin.cmake
+index ac6b6b2a4c2..30bb735426c 100644
+--- a/router/cmake/Plugin.cmake
++++ b/router/cmake/Plugin.cmake
+@@ -161,7 +161,8 @@ FUNCTION(add_harness_plugin NAME)
+         COMPONENT Router)
+       INSTALL(FILES $<TARGET_PDB_FILE:${NAME}>
+         DESTINATION ${_option_DESTINATION}
+-        COMPONENT Router)
++        COMPONENT Router
++        OPTIONAL)
+     ELSE()
+       INSTALL(TARGETS ${NAME}
+         LIBRARY DESTINATION ${_option_DESTINATION}
+-- 
+2.49.0
+
