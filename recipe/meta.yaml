@@ -41,6 +41,7 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
+    - llvm >=17
     - cmake
     - ninja
     - bison                    # [unix]
