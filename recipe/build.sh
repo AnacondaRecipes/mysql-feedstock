@@ -131,6 +131,7 @@ cmake -S$SRC_DIR -Bbuild -GNinja \
   -DINSTALL_MYSQLSHAREDIR=share/mysql \
   -DINSTALL_SUPPORTFILESDIR=mysql/support-files \
   -DWITH_AUTHENTICATION_CLIENT_PLUGINS=ON \
+  -DWITH_BUILD_ID=OFF \
   "${_xtra_cmake_args[@]}"
 
 if [[ $target_platform == osx-arm64 ]] && [[ $CONDA_BUILD_CROSS_COMPILATION == 1 ]]; then

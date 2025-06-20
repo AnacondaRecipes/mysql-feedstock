@@ -41,7 +41,6 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - {{ stdlib("c") }}
     - cmake
     - ninja
     - bison                    # [unix]
@@ -53,6 +52,7 @@ requirements:
     - openssl                  # [target_platform == 'osx-arm64']
     - zlib                     # [target_platform == 'osx-arm64']
     - zstd                     # [target_platform == 'osx-arm64']
+    - git
   host:
     - icu
     - libabseil
@@ -80,7 +80,6 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - {{ stdlib("c") }}
         - cmake
         - ninja
       host:
@@ -114,7 +113,6 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - {{ stdlib("c") }}
         - cmake
         - ninja
       host:
@@ -150,7 +148,6 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - {{ stdlib("c") }}
         - cmake
         - ninja
       host:
@@ -185,7 +182,6 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - {{ stdlib("c") }}
         - cmake
         - ninja
       host:
@@ -213,7 +209,6 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - {{ stdlib("c") }}
         - cmake
         - ninja
       host:
@@ -242,7 +237,6 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - {{ stdlib("c") }}
         - cmake
         - ninja
       host:
@@ -290,6 +284,8 @@ outputs:
         - {{ pin_subpackage('mysql-libs', exact=True) }}
         - {{ pin_subpackage('mysql-common', exact=True) }}
     test:
+      files:
+        - database_test.sh
       commands:
         - test -f $PREFIX/share/man/man1/mysql.1   # [unix]
         - test -f $PREFIX/share/man/man8/mysqld.8  # [unix]
@@ -297,6 +293,7 @@ outputs:
         - my_print_defaults --version
         - mysqld --help --verbose
         - command -v mysql.server                  # [unix]
+        - bash database_test.sh
     about:
       license_file: LICENSE
       license: GPL-2.0-or-later
