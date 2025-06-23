@@ -53,14 +53,16 @@ requirements:
     - openssl                  # [target_platform == 'osx-arm64']
     - zlib                     # [target_platform == 'osx-arm64']
     - zstd                     # [target_platform == 'osx-arm64']
-    - git
+    - git                      # [unix]
+    - patch                    # [unix]
+    - m2-patch                 # [win]
   host:
     - icu
     - libabseil
     - libedit                  # [unix]
     - libprotobuf
-    - lz4-c
-    - openldap                 # [unix]
+    - lz4-c {{ lz4_c }}
+    - openldap {{ openldap }}  # [unix]
     - openssl
     - zlib
     - zstd
@@ -83,8 +85,8 @@ outputs:
         - icu
         - libabseil
         - libprotobuf
-        - lz4-c
-        - openldap                 # [unix]
+        - lz4-c {{ lz4_c }}
+        - openldap {{ openldap }}  # [unix]
         - openssl
         - zlib
         - zstd
@@ -224,7 +226,7 @@ outputs:
       host:
         - icu
         - libprotobuf
-        - lz4-c
+        - lz4-c {{ lz4_c }}
         - openssl
         - zlib
         - zstd
@@ -279,6 +281,8 @@ about:
   license_family: GPL
   license_file: LICENSE
   summary: Open source relational database management system.
+  dev_url: https://dev.mysql.com/
+  doc_url: https://dev.mysql.com/doc/
 
   description: |
     The MySQL(TM) software delivers a very fast, multi-threaded, multi-user,
