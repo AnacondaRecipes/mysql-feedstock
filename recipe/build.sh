@@ -44,6 +44,9 @@ if [[ $target_platform == osx-64 ]]; then
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
 fi
 
+echo 'int main() { return 0; }' > test.cpp
+echo "=== clang++ -v output ==="
+$CXX -v test.cpp -o test 2>&1 | tee $SRC_DIR/clang-v.txt
 
 cmake -S$SRC_DIR -Bbuild -GNinja \
   -DCMAKE_CXX_STANDARD=20 \

@@ -34,14 +34,16 @@ source:
     - patches/0022-Set-PROTOBUF_INCLUDE_DIR-only-if-not-set.patch
     - patches/0023-Allow-setting-WITH_SASL-none.patch
     - patches/0024-Dump-std-out-err-if-abi-check-fails.patch
+    - patches/0025-Remove-unsupported-flag-from-macos-linker.patch
 
 build:
   number: 0
+  ignore_run_exports:  # [osx]
+    - libcxx           # [osx]
 
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - llvm >=17
     - cmake
     - ninja
     - bison                    # [unix]
@@ -78,6 +80,7 @@ outputs:
       # Used only for lber.h, no library needed at runtime
       ignore_run_exports:
         - openldap
+        - libcxx
     requirements:
       build:
         - {{ compiler('cxx') }}
