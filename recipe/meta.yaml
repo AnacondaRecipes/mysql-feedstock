@@ -216,9 +216,6 @@ outputs:
   - name: mysql-router
     script: scripts/install-router.sh   # [unix]
     script: scripts/install-router.bat  # [win]
-    build:
-      # Requires macOS >=10.12
-      skip: true  # [osx]
     requirements:
       build:
         - {{ compiler('cxx') }}
