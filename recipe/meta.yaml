@@ -68,13 +68,9 @@ requirements:
 
 outputs:
   - name: mysql-server
+    script: scripts/install-server.sh   # [unix]
+    script: scripts/install-server.bat  # [win]
     build:
-      script:
-        - cmake -DCOMPONENT=Server -P ${SRC_DIR}/build/cmake_install.cmake             # [unix]
-        - cmake -DCOMPONENT=Server_Scripts -P ${SRC_DIR}/build/cmake_install.cmake     # [unix]
-        - ln -s ${PREFIX}/mysql/support-files/mysql.server ${PREFIX}/bin/mysql.server  # [unix]
-        - cmake -DCOMPONENT=Server -P %SRC_DIR%\build\cmake_install.cmake              # [win]
-        - cmake -DCOMPONENT=Server_Scripts -P %SRC_DIR%\build\cmake_install.cmake      # [win]
       # Used only for lber.h, no library needed at runtime
       ignore_run_exports:
         - openldap
@@ -107,10 +103,8 @@ outputs:
 
 
   - name: mysql-client
-    build:
-      script:
-        - cmake -DCOMPONENT=Client -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
-        - cmake -DCOMPONENT=Client -P %SRC_DIR%\build\cmake_install.cmake   # [win]
+    script: scripts/install-client.sh   # [unix]
+    script: scripts/install-client.bat  # [win]
     requirements:
       build:
         - {{ compiler('cxx') }}
@@ -137,12 +131,9 @@ outputs:
 
 
   - name: mysql-devel
+    script: scripts/install-devel.sh   # [unix]
+    script: scripts/install-devel.bat  # [win]
     build:
-      script:
-        - cmake -DCOMPONENT=Development -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
-        - cmake -DCOMPONENT=Development -P %SRC_DIR%\build\cmake_install.cmake   # [win]
-        - sed -i 's,zlib,z,g' ${PREFIX}/bin/mysql_config        # [linux]
-        - sed -i '' -e 's,zlib,z,g' ${PREFIX}/bin/mysql_config  # [osx]
       run_exports:
         # https://mysqlserverteam.com/the-client-library-part-2-the-version-number/
         - {{ pin_subpackage('mysql-libs', max_pin='x.x') }}
@@ -175,11 +166,8 @@ outputs:
 
 
   - name: mysql-libs
-    build:
-      script:
-        - cmake -DCOMPONENT=SharedLibraries -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
-        - cmake -DCOMPONENT=SharedLibraries -P %SRC_DIR%/build/cmake_install.cmake   # [win]
-        - move %LIBRARY_LIB%\*.dll %LIBRARY_BIN%\                                    # [win]
+    script: scripts/install-libs.sh   # [unix]
+    script: scripts/install-libs.bat  # [win]
     requirements:
       build:
         - {{ compiler('cxx') }}
@@ -203,10 +191,8 @@ outputs:
 
 
   - name: mysql-common
-    build:
-      script:
-        - cmake -P ${SRC_DIR}/build/share/cmake_install.cmake  # [unix]
-        - cmake -P %SRC_DIR%\build\share\cmake_install.cmake   # [win]
+    script: scripts/install-common.sh   # [unix]
+    script: scripts/install-common.bat  # [win]
     requirements:
       build:
         - {{ compiler('cxx') }}
@@ -228,13 +214,11 @@ outputs:
       summary: Common files for server and client libraries
 
   - name: mysql-router
+    script: scripts/install-router.sh   # [unix]
+    script: scripts/install-router.bat  # [win]
     build:
       # Requires macOS >=10.12
       skip: true  # [osx]
-      script:
-        - cmake -DCOMPONENT=Router -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
-        - cmake -DCOMPONENT=Router -P %SRC_DIR%\build\cmake_install.cmake   # [win]
-        - move %LIBRARY_LIB%\*.dll %LIBRARY_BIN%\                           # [win]
     requirements:
       build:
         - {{ compiler('cxx') }}
@@ -259,17 +243,8 @@ outputs:
 
 
   - name: mysql
-    build:
-      script:
-        - cmake -DCOMPONENT=Documentation -P ${SRC_DIR}/build/cmake_install.cmake  # [unix]
-        - cmake -DCOMPONENT=Info -P ${SRC_DIR}/build/cmake_install.cmake           # [unix]
-        - cmake -DCOMPONENT=ManPages -P ${SRC_DIR}/build/cmake_install.cmake       # [unix]
-        - cmake -DCOMPONENT=Readme -P ${SRC_DIR}/build/cmake_install.cmake         # [unix]
-        - cmake -DCOMPONENT=SupportFiles -P ${SRC_DIR}/build/cmake_install.cmake   # [unix]
-        - cmake -DCOMPONENT=Documentation -P %SRC_DIR%\build\cmake_install.cmake   # [win]
-        - cmake -DCOMPONENT=Info -P %SRC_DIR%\build\cmake_install.cmake            # [win]
-        - cmake -DCOMPONENT=Readme -P %SRC_DIR%\build\cmake_install.cmake          # [win]
-        - cmake -DCOMPONENT=SupportFiles -P %SRC_DIR%\build\cmake_install.cmake    # [win]
+    script: scripts/install-all.sh   # [unix]
+    script: scripts/install-all.bat  # [win]
     requirements:
       build:
         - cmake
