@@ -38,8 +38,6 @@ source:
 
 build:
   number: 0
-  ignore_run_exports:  # [osx]
-    - libcxx           # [osx]
 
 requirements:
   build:
@@ -80,7 +78,6 @@ outputs:
       # Used only for lber.h, no library needed at runtime
       ignore_run_exports:
         - openldap
-        - libcxx
     requirements:
       build:
         - {{ compiler('cxx') }}
