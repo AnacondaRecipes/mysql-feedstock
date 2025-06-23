@@ -37,6 +37,9 @@ source:
     - patches/0025-Remove-unsupported-flag-from-macos-linker.patch
 
 build:
+  # Missing bison for Windows
+  # Leaving all the windows parts of the recipe for future reference
+  skip: true  # [win]
   number: 0
 
 requirements:
