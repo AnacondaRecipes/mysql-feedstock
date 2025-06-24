@@ -41,8 +41,6 @@ build:
   # Leaving all the windows parts of the recipe for future reference
   skip: true  # [win]
   number: 0
-  script_env:                      # [osx and x86_64]
-    - SDKROOT=/opt/MacOSX13.3.sdk  # [osx and x86_64]
 
 requirements:
   build:
