@@ -268,7 +268,7 @@ outputs:
         - my_print_defaults --version
         - mysqld --help --verbose
         - command -v mysql.server                  # [unix]
-        - bash database_test.sh
+        - bash database_test.sh                    # [unix]
     about:
       license_file: LICENSE
       license: GPL-2.0-or-later
