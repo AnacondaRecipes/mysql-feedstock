@@ -111,7 +111,7 @@ outputs:
       build:
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
       host:
         - libedit  # [unix]
         - openssl
