@@ -46,7 +46,7 @@ requirements:
     - ninja
     - bison                    # [unix]
     - diffutils                # [unix]
-    - m2-bison                 # [win]
+    - msys2-bison              # [win]
     - pkg-config
     - icu                      # [target_platform == 'osx-arm64']
     - libprotobuf              # [target_platform == 'osx-arm64']
@@ -55,7 +55,7 @@ requirements:
     - zstd                     # [target_platform == 'osx-arm64']
     - git                      # [unix]
     - patch                    # [unix]
-    - m2-patch                 # [win]
+    - msys2-patch              # [win]
   host:
     - icu {{ icu }}
     - libabseil {{ libabseil }}
