@@ -57,15 +57,15 @@ requirements:
     - patch                    # [unix]
     - m2-patch                 # [win]
   host:
-    - icu
-    - libabseil
-    - libedit                  # [unix]
-    - libprotobuf
+    - icu {{ icu }}
+    - libabseil {{ libabseil }}
+    - libedit {{ libedit }}  # [unix]
+    - libprotobuf {{ libprotobuf }}
     - lz4-c {{ lz4_c }}
     - openldap {{ openldap }}  # [unix]
-    - openssl
-    - zlib
-    - zstd
+    - openssl {{ openssl }}
+    - zlib {{ zlib }}
+    - zstd {{ zstd }}
 
 
 outputs:
@@ -80,7 +80,7 @@ outputs:
       build:
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
       host:
         - icu
         - libabseil
