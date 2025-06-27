@@ -43,7 +43,7 @@ requirements:
   build:
     - {{ compiler('cxx') }}
     - cmake
-    - ninja
+    - ninja-base
     - bison                    # [unix]
     - diffutils                # [unix]
     - msys2-bison              # [win]
@@ -143,7 +143,7 @@ outputs:
       build:
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
       host:
         # 2022/03/20 hmaarrfk
         # Add openssl to ensure a unique build number fo mysql-devel
@@ -174,7 +174,7 @@ outputs:
       build:
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
       host:
         - openssl
         - zlib
@@ -199,7 +199,7 @@ outputs:
       build:
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
       host:
         # 2022/03/20 hmaarrfk
         # Add openssl to ensure a unique build number fo mysql-devel
@@ -222,7 +222,7 @@ outputs:
       build:
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
       host:
         - icu
         - libprotobuf
@@ -247,7 +247,7 @@ outputs:
     requirements:
       build:
         - cmake
-        - ninja
+        - ninja-base
       host:
         # 2022/03/20 hmaarrfk
         # Add openssl to ensure a unique build number fo mysql-devel
