@@ -82,14 +82,14 @@ outputs:
         - cmake
         - ninja-base
       host:
-        - icu
-        - libabseil
-        - libprotobuf
+        - icu {{ icu }}
+        - libabseil {{ libabseil }}
+        - libprotobuf {{ libprotobuf }}
         - lz4-c {{ lz4_c }}
         - openldap {{ openldap }}  # [unix]
-        - openssl
-        - zlib
-        - zstd
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
         - {{ pin_subpackage('mysql-common', exact=True) }}
       run:
         - {{ pin_subpackage('mysql-common', exact=True) }}
@@ -113,10 +113,10 @@ outputs:
         - cmake
         - ninja-base
       host:
-        - libedit  # [unix]
-        - openssl
-        - zlib
-        - zstd
+        - libedit {{ libedit }}  # [unix]
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
         - {{ pin_subpackage('mysql-common', exact=True) }}
       run:
         - {{ pin_subpackage('mysql-common', exact=True) }}
@@ -147,7 +147,7 @@ outputs:
       host:
         # 2022/03/20 hmaarrfk
         # Add openssl to ensure a unique build number fo mysql-devel
-        - openssl
+        - openssl {{ openssl }}
         - {{ pin_subpackage('mysql-libs', exact=True) }}
       run:
         - {{ pin_subpackage('mysql-libs', exact=True) }}
@@ -176,9 +176,9 @@ outputs:
         - cmake
         - ninja-base
       host:
-        - openssl
-        - zlib
-        - zstd
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
         - {{ pin_subpackage('mysql-common', exact=True) }}
       run:
         - {{ pin_subpackage('mysql-common', exact=True) }}
@@ -203,7 +203,7 @@ outputs:
       host:
         # 2022/03/20 hmaarrfk
         # Add openssl to ensure a unique build number fo mysql-devel
-        - openssl
+        - openssl {{ openssl }}
     test:
       commands:
         - test -f $PREFIX/share/mysql/english/errmsg.sys  # [unix]
@@ -224,12 +224,12 @@ outputs:
         - cmake
         - ninja-base
       host:
-        - icu
-        - libprotobuf
+        - icu {{ icu }}
+        - libprotobuf {{ libprotobuf }}
         - lz4-c {{ lz4_c }}
-        - openssl
-        - zlib
-        - zstd
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
     test:
       commands:
         - mysqlrouter --version
@@ -251,7 +251,7 @@ outputs:
       host:
         # 2022/03/20 hmaarrfk
         # Add openssl to ensure a unique build number fo mysql-devel
-        - openssl
+        - openssl {{ openssl }}
       run:
         - {{ pin_subpackage('mysql-server', exact=True) }}
         - {{ pin_subpackage('mysql-client', exact=True) }}
