@@ -1,0 +1,138 @@
+diff --git a/cmake/component.cmake b/cmake/component.cmake
+index a77fa0f8..6282a18f 100644
+--- a/cmake/component.cmake
++++ b/cmake/component.cmake
+@@ -99,7 +99,8 @@ MACRO(MYSQL_ADD_COMPONENT component_arg)
+     SET_PATH_TO_CUSTOM_SSL_FOR_APPLE(${target})
+ 
+     IF(APPLE)
+-      TARGET_LINK_OPTIONS(${target} PRIVATE LINKER:-no_warn_duplicate_libraries)
++      # Unsupported flag in ld64:
++      # TARGET_LINK_OPTIONS(${target} PRIVATE LINKER:-no_warn_duplicate_libraries)
+     ENDIF()
+ 
+     IF(WIN32_CLANG AND WITH_ASAN)
+diff --git a/cmake/libutils.cmake b/cmake/libutils.cmake
+index 69adcdb0..a2d97ec4 100644
+--- a/cmake/libutils.cmake
++++ b/cmake/libutils.cmake
+@@ -358,7 +358,8 @@ MACRO(MERGE_LIBRARIES_SHARED TARGET_ARG)
+ 
+   IF(APPLE)
+     SET_TARGET_PROPERTIES(${TARGET} PROPERTIES MACOSX_RPATH ON)
+-    TARGET_LINK_OPTIONS(${TARGET} PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(${NAME} PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   TARGET_LINK_OPTIONS(${TARGET} PRIVATE ${export_link_flags})
+@@ -704,7 +705,8 @@ FUNCTION(ADD_SHARED_LIBRARY TARGET_ARG)
+   ENDIF()
+ 
+   IF(APPLE)
+-    TARGET_LINK_OPTIONS(${TARGET} PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(${TARGET} PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   ADD_OBJDUMP_TARGET(show_${TARGET} "$<TARGET_FILE:${TARGET}>"
+diff --git a/cmake/mysql_add_executable.cmake b/cmake/mysql_add_executable.cmake
+index 2a0548bc..996f3e49 100644
+--- a/cmake/mysql_add_executable.cmake
++++ b/cmake/mysql_add_executable.cmake
+@@ -213,7 +213,8 @@ FUNCTION(MYSQL_ADD_EXECUTABLE target_arg)
+   ENDIF()
+ 
+   IF(APPLE)
+-    TARGET_LINK_OPTIONS(${target} PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(${NAME} PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   IF(WIN32_CLANG AND WITH_ASAN)
+diff --git a/cmake/plugin.cmake b/cmake/plugin.cmake
+index a7727ef6..9d8baf58 100644
+--- a/cmake/plugin.cmake
++++ b/cmake/plugin.cmake
+@@ -328,7 +328,8 @@ MACRO(MYSQL_ADD_PLUGIN plugin_arg)
+   ENDIF()
+ 
+   IF(BUILD_PLUGIN AND ARG_MODULE_ONLY AND APPLE)
+-    TARGET_LINK_OPTIONS(${target} PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(${NAME} PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   IF(BUILD_PLUGIN)
+diff --git a/extra/protobuf/protobuf-24.4/cmake/libprotobuf-lite.cmake b/extra/protobuf/protobuf-24.4/cmake/libprotobuf-lite.cmake
+index f601e7fe..32d4ef1e 100644
+--- a/extra/protobuf/protobuf-24.4/cmake/libprotobuf-lite.cmake
++++ b/extra/protobuf/protobuf-24.4/cmake/libprotobuf-lite.cmake
+@@ -58,8 +58,9 @@ IF(protobuf_BUILD_SHARED_LIBS)
+     )
+ 
+   IF(APPLE)
+-    TARGET_LINK_OPTIONS(libprotobuf-lite
+-      PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(libprotobuf-lite
++    #   PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   IF(WIN32)
+diff --git a/extra/protobuf/protobuf-24.4/cmake/libprotobuf.cmake b/extra/protobuf/protobuf-24.4/cmake/libprotobuf.cmake
+index 81428fbb..f3062e35 100644
+--- a/extra/protobuf/protobuf-24.4/cmake/libprotobuf.cmake
++++ b/extra/protobuf/protobuf-24.4/cmake/libprotobuf.cmake
+@@ -62,7 +62,8 @@ IF(protobuf_BUILD_SHARED_LIBS)
+     )
+ 
+   IF(APPLE)
+-    TARGET_LINK_OPTIONS(libprotobuf PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(libprotobuf PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   IF(WIN32)
+diff --git a/extra/protobuf/protobuf-24.4/cmake/libprotoc.cmake b/extra/protobuf/protobuf-24.4/cmake/libprotoc.cmake
+index ef630374..bea2a0aa 100644
+--- a/extra/protobuf/protobuf-24.4/cmake/libprotoc.cmake
++++ b/extra/protobuf/protobuf-24.4/cmake/libprotoc.cmake
+@@ -54,7 +54,8 @@ IF(protobuf_BUILD_SHARED_LIBS)
+     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/library_output_directory
+     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/library_output_directory)
+   IF(APPLE)
+-    TARGET_LINK_OPTIONS(libprotoc PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(libprotoc PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+   IF(WIN32)
+     ADD_CUSTOM_COMMAND(TARGET libprotoc POST_BUILD
+diff --git a/extra/protobuf/protobuf-24.4/cmake/protoc.cmake b/extra/protobuf/protobuf-24.4/cmake/protoc.cmake
+index 215eb215..3f1cba2e 100644
+--- a/extra/protobuf/protobuf-24.4/cmake/protoc.cmake
++++ b/extra/protobuf/protobuf-24.4/cmake/protoc.cmake
+@@ -16,7 +16,8 @@ set_target_properties(protoc PROPERTIES
+ ################################################################
+ 
+ IF(APPLE)
+-  TARGET_LINK_OPTIONS(protoc PRIVATE LINKER:-no_warn_duplicate_libraries)
++  # Unsupported flag in ld64:
++  # TARGET_LINK_OPTIONS(protoc PRIVATE LINKER:-no_warn_duplicate_libraries)
+ ENDIF()
+ 
+ SET_TARGET_PROPERTIES(protoc PROPERTIES
+diff --git a/router/cmake/Plugin.cmake b/router/cmake/Plugin.cmake
+index ac6b6b2a..7a1acbf0 100644
+--- a/router/cmake/Plugin.cmake
++++ b/router/cmake/Plugin.cmake
+@@ -90,7 +90,8 @@ FUNCTION(add_harness_plugin NAME)
+   ADD_LIBRARY(${NAME} SHARED ${_option_SOURCES})
+   TARGET_COMPILE_FEATURES(${NAME} PUBLIC cxx_std_20)
+   IF(APPLE)
+-    TARGET_LINK_OPTIONS(${NAME} PRIVATE LINKER:-no_warn_duplicate_libraries)
++    # Unsupported flag in ld64:
++    # TARGET_LINK_OPTIONS(${NAME} PRIVATE LINKER:-no_warn_duplicate_libraries)
+   ENDIF()
+ 
+   # add plugin to build-all target

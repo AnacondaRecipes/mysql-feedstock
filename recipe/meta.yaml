@@ -1,63 +1,298 @@
-{% set major_minor_version = "8.4" %}
-{% set micro_version = "0" %}
-{% set version = major_minor_version + "." + micro_version %}
+{% set version = "9.3.0" %}
+{% set major_minor = ".".join(version.split(".")[:2]) %}
 
 package:
-  name: mysql
+  name: mysql-suite
   version: {{ version }}
 
 source:
-  - url: https://cdn.mysql.com/Downloads/MySQL-{{ major_minor_version }}/mysql-{{ version }}.tar.gz
-    sha256: 47a5433fcdd639db836b99e1b5459c2b813cbdad23ff2b5dd4ad27f792ba918e
-    patches:
-      - 0001-Allow-flags-other-than-macros-in-CPPFLAGS.patch
-      - 0002-Use-new-protobuf-methods.patch
-      - 0024-Link-to-absl_spinlock_wait.patch
+  url: https://cdn.mysql.com/Downloads/MySQL-{{ major_minor }}/mysql-{{ version }}.tar.gz
+  sha256: 1a3ee236f1daac5ef897c6325c9b0e0aae486389be1b8001deb3ff77ce682d60
+  patches:
+    - patches/0001-Make-installation-of-pdb-files-optional.patch
+    - patches/0002-Fix-file-path-for-mysqlrouter.conf.sample-for-instal.patch
+    - patches/0003-Allow-flags-other-than-macros-in-CPPFLAGS.patch
+    - patches/0004-Add-include-header-for-std-string.patch
+    - patches/0005-Remove-forceful-injection-of-debug-info.patch
+    - patches/0006-Link-libgcc-libstdc-statically-for-codgen-binaries.patch
+    - patches/0007-Add-dependency-on-comp_err-iff-that-target-exists.patch
+    - patches/0008-Add-constructor-s-for-ut-Location.patch
+    - patches/0009-Reduce-number-of-symbols-being-exported-from-mysqld..patch
+    - patches/0010-Ensure-sql_main-uses-protobuf-shared-library-correct.patch
+    - patches/0011-Include-missing-header-for-std-isdigit.patch
+    - patches/0012-Print-number-of-lines-in-the-file-generated-by-creat.patch
+    - patches/0013-Check-for-ARMv8-crc32-intrinsic-support-on-osx-arm64.patch
+    - patches/0014-Revert-Bug-30981914-COMPILE-WITH-FASTER-TLS-MODEL.patch
+    - patches/0015-Zlib-module-use-macro-instead-of-function.patch
+    - patches/0016-Make-get_relative_path-binary-patching-friendly.patch
+    ## Avoid crash on ppc64le, aarch64
+    - patches/0017-Revert-BUG-34849343-Aligned_atomic-not-working-as-in.patch
+    - patches/0018-Make-libfido-checks-conditional.patch
+    - patches/0019-Don-t-include-headers-from-Homebrew.patch
+    - patches/0020-Use-config-mode-search-for-protobuf-first.patch
+    - patches/0021-Simplify-protobuf-deps-using-cmake-alias.patch
+    - patches/0022-Set-PROTOBUF_INCLUDE_DIR-only-if-not-set.patch
+    - patches/0023-Allow-setting-WITH_SASL-none.patch
+    - patches/0024-Dump-std-out-err-if-abi-check-fails.patch
+    - patches/0025-Remove-unsupported-flag-from-macos-linker.patch
 
 build:
-  number: 2
-  skip: True # [win]
+  number: 0
 
 requirements:
   build:
-    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - patch    # [not win]
-    - m2-patch # [win]
-    - patchelf # [linux]
     - cmake
-    - ninja
-    - bison    # [unix]
+    - ninja-base
+    - bison                    # [unix]
+    - diffutils                # [unix]
+    - msys2-bison              # [win]
     - pkg-config
-
+    - icu                      # [osx and arm64]
+    - libprotobuf              # [osx and arm64]
+    - openssl                  # [osx and arm64]
+    - zlib                     # [osx and arm64]
+    - zstd                     # [osx and arm64]
+    - git                      # [unix]
+    - patch                    # [unix]
+    - msys2-patch              # [win]
   host:
     - icu {{ icu }}
-    - libcurl 8.7.1
-    - libedit 3.1.20230828 # [unix]
-    - libprotobuf 5.29.3
-    - libabseil 20250127.0
-    - lz4-c 1.9.4
+    - libabseil {{ libabseil }}
+    - libedit {{ libedit }}  # [unix]
+    - libprotobuf {{ libprotobuf }}
+    - lz4-c {{ lz4_c }}
+    - openldap {{ openldap }}  # [unix]
     - openssl {{ openssl }}
     - zlib {{ zlib }}
     - zstd {{ zstd }}
-test:
-  commands:
-    - mysql_config --version
-    - my_print_defaults --version
-    - mysqld --help --verbose
-    - command -v mysql.server
+
+
+outputs:
+  - name: mysql-server
+    script: scripts/install-server.sh   # [unix]
+    script: scripts/install-server.bat  # [win]
+    build:
+      # Used only for lber.h, no library needed at runtime
+      ignore_run_exports:
+        - openldap
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja-base
+      host:
+        - icu {{ icu }}
+        - libabseil {{ libabseil }}
+        - libprotobuf {{ libprotobuf }}
+        - lz4-c {{ lz4_c }}
+        - openldap {{ openldap }}  # [unix]
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - mysqld --version
+        - test -f ${PREFIX}/lib/plugin/mysql_no_login.so               # [unix]
+        - if not exist %LIBRARY_LIB%\plugin\mysql_no_login.dll exit 1  # [win]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: Database server and related tools
+
+
+  - name: mysql-client
+    script: scripts/install-client.sh   # [unix]
+    script: scripts/install-client.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja-base
+      host:
+        - libedit {{ libedit }}  # [unix]
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - mysql --version
+        - mysqldump --version
+        - test -f ${PREFIX}/lib/plugin/mysql_native_password.so  # [unix]
+        - if not exist %LIBRARY_LIB%\plugin\mysql_native_password.dll exit 1  # [win]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: MySQL client applications and tools
+
+
+  - name: mysql-devel
+    script: scripts/install-devel.sh   # [unix]
+    script: scripts/install-devel.bat  # [win]
+    build:
+      run_exports:
+        # https://mysqlserverteam.com/the-client-library-part-2-the-version-number/
+        - {{ pin_subpackage('mysql-libs', max_pin='x.x') }}
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja-base
+      host:
+        # 2022/03/20 hmaarrfk
+        # Add openssl to ensure a unique build number fo mysql-devel
+        - openssl {{ openssl }}
+        - {{ pin_subpackage('mysql-libs', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-libs', exact=True) }}
+    test:
+      commands:
+        - test -f $PREFIX/include/mysql/mysql.h                     # [unix]
+        - test -f $PREFIX/include/mysql/mysqlx_version.h            # [unix]
+        - test -f $PREFIX/lib/pkgconfig/mysqlclient.pc              # [unix]
+        - if not exist %LIBRARY_INC%\mysql\mysql.h exit 1           # [win]
+        - if not exist %LIBRARY_INC%\mysql\mysqlx_version.h exit 1  # [win]
+        - if not exist %LIBRARY_LIB%\mysqlclient.lib exit 1         # [win]
+        - mysql_config --version                                    # [unix]
+        - mysql_config --libs                                       # [unix]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: Development header files and libraries for MySQL database client applications
+
+
+  - name: mysql-libs
+    script: scripts/install-libs.sh   # [unix]
+    script: scripts/install-libs.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja-base
+      host:
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+      run:
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      commands:
+        - test -f ${PREFIX}/lib/libmysqlclient${SHLIB_EXT}      # [unix]
+        - if not exist %LIBRARY_BIN%\libmysql.dll exit 1        # [win]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: Shared libraries for MySQL database client applications
+
+
+  - name: mysql-common
+    script: scripts/install-common.sh   # [unix]
+    script: scripts/install-common.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja-base
+      host:
+        # 2022/03/20 hmaarrfk
+        # Add openssl to ensure a unique build number fo mysql-devel
+        - openssl {{ openssl }}
+    test:
+      commands:
+        - test -f $PREFIX/share/mysql/english/errmsg.sys  # [unix]
+        - test -f $PREFIX/share/mysql/charsets/ascii.xml  # [unix]
+        - if not exist %LIBRARY_PREFIX%\share\mysql\english\errmsg.sys exit 1  # [win]
+        - if not exist %LIBRARY_PREFIX%\share\mysql\charsets\ascii.xml exit 1  # [win]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: Common files for server and client libraries
+
+  - name: mysql-router
+    script: scripts/install-router.sh   # [unix]
+    script: scripts/install-router.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja-base
+      host:
+        - icu {{ icu }}
+        - libprotobuf {{ libprotobuf }}
+        - lz4-c {{ lz4_c }}
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
+        - zstd {{ zstd }}
+    test:
+      commands:
+        - mysqlrouter --version
+        - test -f $PREFIX/lib/mysqlrouter/http_auth_backend.so   # [unix]
+        - test -f %LIBRARY_PREFIX%\bin\mysqlrouter_http.dll      # [win]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: MySQL Router binaries
+
+
+  - name: mysql
+    script: scripts/install-all.sh   # [unix]
+    script: scripts/install-all.bat  # [win]
+    requirements:
+      build:
+        - cmake
+        - ninja-base
+      host:
+        # 2022/03/20 hmaarrfk
+        # Add openssl to ensure a unique build number fo mysql-devel
+        - openssl {{ openssl }}
+      run:
+        - {{ pin_subpackage('mysql-server', exact=True) }}
+        - {{ pin_subpackage('mysql-client', exact=True) }}
+        - {{ pin_subpackage('mysql-devel', exact=True) }}
+        - {{ pin_subpackage('mysql-libs', exact=True) }}
+        - {{ pin_subpackage('mysql-common', exact=True) }}
+    test:
+      files:
+        - database_test.sh
+      commands:
+        - test -f $PREFIX/share/man/man1/mysql.1   # [unix]
+        - test -f $PREFIX/share/man/man8/mysqld.8  # [unix]
+        - mysql_config --version                   # [unix]
+        - my_print_defaults --version
+        - mysqld --help --verbose
+        - command -v mysql.server                  # [unix]
+        - bash database_test.sh                    # [unix]
+    about:
+      license_file: LICENSE
+      license: GPL-2.0-or-later
+      summary: Meta package for backwards compat + bonus content
+
 
 about:
   home: https://www.mysql.com/
-  license: GPL-2.0-only
+  license: GPL-2.0-or-later
   license_family: GPL
   license_file: LICENSE
   summary: Open source relational database management system.
+  dev_url: https://dev.mysql.com/
+  doc_url: https://dev.mysql.com/doc/
+
   description: |
     The MySQL(TM) software delivers a very fast, multi-threaded, multi-user,
     and robust SQL (Structured Query Language) database server. MySQL Server
     is intended for mission-critical, heavy-load production systems as well
     as for embedding into mass-deployed software.
-  documentation: https://dev.mysql.com/doc/
-  doc_url: https://dev.mysql.com/doc/refman/{{ major_minor_version }}/en/
-  dev_url: https://github.com/mysql/mysql-server
+
+
+extra:
+  recipe-maintainers:
+    - beckermr
+    - nehaljwani
+    - xhochy

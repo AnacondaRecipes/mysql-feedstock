@@ -1,5 +1,6 @@
 #!/bin/bash
-set -x
+
+set -ex
 
 # Make rpcgen use C Pre Processor provided by the Conda ecosystem. The
 # rpcgen binary assumes that the corresponding binary is always 'cpp'.
@@ -9,17 +10,10 @@ if [[ "${target_platform}" == *"linux"* ]]; then
     ## We don't have a conda package for rpcgen, but it is present in the
     ## compiler sysroot on Linux. However, the value of PT_INTERP is not
     ## convenient for executing it. ('lib' instead of 'lib64')
-    _target_sysroot=$(realpath $($CXX --print-sysroot))
+    _target_sysroot=$(${CXX_FOR_BUILD:-$CC} --print-sysroot)
     _target_rpcgen_bin=${_target_sysroot}/usr/bin/rpcgen
-    _target_interpreter=$(realpath ${_target_sysroot}/$(patchelf --print-interpreter ${_target_rpcgen_bin}))
-    if [[ "${target_platform}" == "linux-s390x" ]]; then
-        # FIXME! the interpreter symlink found in the s390x sysroot is broken
-        # (literal 'ld64.so*' instead of 'ld64.so.1').
-        # this workaround assumes that there's exactly one ld-*.so library in the
-        # sysroot. if more than one or no library matches the glob, build will fail.
-        _target_interpreter=$(dirname "${_target_interpreter}")/ld-*.so
-    fi
-    _target_libdir=${_target_sysroot}/$(dirname ${_target_interpreter} | rev | cut -d '/' -f 1 | rev)
+    _target_interpreter=${_target_sysroot}/$(patchelf --print-interpreter ${_target_rpcgen_bin})
+    _target_libdir=$(dirname ${_target_interpreter})
 
     ## Generate a wrapper which will use the interpreter provided in the
     ## compiler sysroot to exec rpcgen and also provide the appropriate
@@ -29,7 +23,7 @@ if [[ "${target_platform}" == *"linux"* ]]; then
 #!/bin/bash
 ${_target_interpreter} --library-path ${_target_libdir} ${_target_rpcgen_bin} -Y ${_rpcgen_hack_dir}/bin \$@
 EOF
-    ln -s $(readlink -f ${CPP}) ${_rpcgen_hack_dir}/bin/cpp
+    ln -sf $(readlink -f ${CPP}) ${_rpcgen_hack_dir}/bin/cpp
     chmod +x ${_rpcgen_hack_dir}/bin/{rpcgen,cpp}
 
 elif [[ "${target_platform}" == *"osx"* ]]; then
@@ -40,45 +34,48 @@ elif [[ "${target_platform}" == *"osx"* ]]; then
 #!/bin/bash
 rpcgen -Y ${_rpcgen_hack_dir}/bin \$@
 EOF
-    ln -s $BUILD_PREFIX/bin/$(basename ${CC}) ${_rpcgen_hack_dir}/bin/cpp
+    ln -sf $BUILD_PREFIX/bin/$(basename ${CC}) ${_rpcgen_hack_dir}/bin/cpp
     chmod +x ${_rpcgen_hack_dir}/bin/{rpcgen,cpp}
 fi
 
 declare -a _xtra_cmake_args
 if [[ $target_platform == osx-64 ]]; then
-    _xtra_cmake_args+=(-DWITH_ROUTER=OFF)
     export CXXFLAGS="${CXXFLAGS:-} -D_LIBCPP_DISABLE_AVAILABILITY=1"
-fi
-if [[ $target_platform == linux-aarch64 ]]; then
-    _xtra_cmake_args+=(-DWITH_BUILD_ID=OFF)
 fi
 
 cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DCMAKE_CXX_STANDARD=20 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
-  -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+  -DCOMPILATION_COMMENT=Anaconda \
+  -DCMAKE_FIND_FRAMEWORK=LAST \
+  -DOPENSSL_ROOT_DIR=$PREFIX \
+  -DPKG_CONFIG_EXECUTABLE=${BUILD_PREFIX}/bin/pkg-config \
+  -DWITH_UNIT_TESTS=OFF \
+  -DWITH_ZLIB=system \
+  -DWITH_ZSTD=system \
+  -DWITH_LZ4=system \
+  -DWITH_ICU=system \
+  -DWITH_EDITLINE=system \
+  -DWITH_PROTOBUF=system \
+  -DWITH_KERBEROS=none \
+  -DWITH_FIDO=none \
+  -DWITH_SASL=none \
+  -DPROTOBUF_INCLUDE_DIR=${PREFIX}/include \
+  -DDEFAULT_CHARSET=utf8 \
+  -DDEFAULT_COLLATION=utf8_general_ci \
   -DINSTALL_INCLUDEDIR=include/mysql \
   -DINSTALL_MANDIR=share/man \
   -DINSTALL_DOCDIR=share/doc/mysql \
   -DINSTALL_DOCREADMEDIR=mysql \
   -DINSTALL_INFODIR=share/info \
+  -DCMAKE_INSTALL_PREFIX=$PREFIX \
   -DINSTALL_MYSQLSHAREDIR=share/mysql \
-  -DINSTALL_MYSQLTESTDIR= \
   -DINSTALL_SUPPORTFILESDIR=mysql/support-files \
-  -DPROTOBUF_INCLUDE_DIR=${PREFIX}/include \
-  -DWITH_PROTOBUF="system" \
-  -DCMAKE_FIND_FRAMEWORK=LAST \
-  -DADD_GDB_INDEX=OFF \
-  -DMYSQL_MAINTAINER_MODE=OFF \
-  -DWITH_SYSTEM_LIBS=ON \
-  -DWITH_AUTHENTICATION_LDAP=OFF \
-  -DWITH_UNIT_TESTS=OFF \
-  -DDEFAULT_CHARSET=utf8 \
-  -DDEFAULT_COLLATION=utf8_general_ci \
-  -DCOMPILATION_COMMENT=Anaconda \
+  -DWITH_AUTHENTICATION_CLIENT_PLUGINS=ON \
+  -DWITH_BUILD_ID=OFF \
   "${_xtra_cmake_args[@]}"
 
-cmake --build build --target install
+export NINJA_STATUS="[%f+%r/%t] "
 
-ln -s ${PREFIX}/mysql/support-files/mysql.server ${PREFIX}/bin/mysql.server
+cmake --build build
