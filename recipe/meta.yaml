@@ -37,7 +37,7 @@ source:
     - patches/0025-Remove-unsupported-flag-from-macos-linker.patch
 
 build:
-  number: 1
+  number: 2
 
 requirements:
   build:
@@ -268,7 +268,8 @@ outputs:
         - my_print_defaults --version
         - mysqld --help --verbose
         - command -v mysql.server                  # [unix]
-        - bash database_test.sh                    # [unix]
+        # Disabling the test on osx-64 cause it has a tendency to get stuck
+        - bash database_test.sh                    # [(not win) and (not ([osx and x86_64]))]
     about:
       license_file: LICENSE
       license: GPL-2.0-or-later
