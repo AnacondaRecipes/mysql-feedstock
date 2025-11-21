@@ -68,7 +68,7 @@ requirements:
     - openssl {{ openssl }}
     - zlib {{ zlib }}
     - zstd {{ zstd }}
-    - libtirpc {{ libtirpc }}  # [linux]
+    - libtirpc  # [linux]
 
 
 outputs:
