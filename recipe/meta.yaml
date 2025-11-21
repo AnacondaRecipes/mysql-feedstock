@@ -56,6 +56,8 @@ requirements:
     - git                      # [unix]
     - patch                    # [unix]
     - msys2-patch              # [win]
+    - libtirpc                 # [linux]
+
   host:
     - icu {{ icu }}
     - libabseil {{ libabseil }}
@@ -66,6 +68,7 @@ requirements:
     - openssl {{ openssl }}
     - zlib {{ zlib }}
     - zstd {{ zstd }}
+    - libtirpc {{ libtirpc }}  # [linux]
 
 
 outputs:
