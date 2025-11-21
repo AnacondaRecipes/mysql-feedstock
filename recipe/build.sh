@@ -2,41 +2,8 @@
 
 set -ex
 
-# Make rpcgen use C Pre Processor provided by the Conda ecosystem. The
-# rpcgen binary assumes that the corresponding binary is always 'cpp'.
-_rpcgen_hack_dir=$SRC_DIR/rpcgen_hack
-
-if [[ "${target_platform}" == *"linux"* ]]; then
-    ## We don't have a conda package for rpcgen, but it is present in the
-    ## compiler sysroot on Linux. However, the value of PT_INTERP is not
-    ## convenient for executing it. ('lib' instead of 'lib64')
-    _target_sysroot=$(${CXX_FOR_BUILD:-$CC} --print-sysroot)
-    _target_rpcgen_bin=${_target_sysroot}/usr/bin/rpcgen
-    _target_interpreter=${_target_sysroot}/$(patchelf --print-interpreter ${_target_rpcgen_bin})
-    _target_libdir=$(dirname ${_target_interpreter})
-
-    ## Generate a wrapper which will use the interpreter provided in the
-    ## compiler sysroot to exec rpcgen and also provide the appropriate
-    ## /path/to/dir containing the C Pre Processor (cpp) binary.
-    mkdir -p $_rpcgen_hack_dir/bin
-    cat <<EOF > ${_rpcgen_hack_dir}/bin/rpcgen
-#!/bin/bash
-${_target_interpreter} --library-path ${_target_libdir} ${_target_rpcgen_bin} -Y ${_rpcgen_hack_dir}/bin \$@
-EOF
-    ln -sf $(readlink -f ${CPP}) ${_rpcgen_hack_dir}/bin/cpp
-    chmod +x ${_rpcgen_hack_dir}/bin/{rpcgen,cpp}
-
-elif [[ "${target_platform}" == *"osx"* ]]; then
-    ## Unlink GNU Compilers, Clang doesn't provide a separate binary
-    ## for pre processing. So we trick rpcgen to use our Clang instead.
-    mkdir -p $_rpcgen_hack_dir/bin
-    cat <<EOF > ${_rpcgen_hack_dir}/bin/rpcgen
-#!/bin/bash
-rpcgen -Y ${_rpcgen_hack_dir}/bin \$@
-EOF
-    ln -sf $BUILD_PREFIX/bin/$(basename ${CC}) ${_rpcgen_hack_dir}/bin/cpp
-    chmod +x ${_rpcgen_hack_dir}/bin/{rpcgen,cpp}
-fi
+# rpcgen is provided by the rpcsvc-proto package, which is available
+# in BUILD_PREFIX/bin and should work correctly with the Conda cpp.
 
 declare -a _xtra_cmake_args
 if [[ $target_platform == osx-64 ]]; then
@@ -46,7 +13,7 @@ fi
 cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DCMAKE_CXX_STANDARD=20 \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH="${_rpcgen_hack_dir};$PREFIX" \
+  -DCMAKE_PREFIX_PATH="$PREFIX" \
   -DCOMPILATION_COMMENT=Anaconda \
   -DCMAKE_FIND_FRAMEWORK=LAST \
   -DOPENSSL_ROOT_DIR=$PREFIX \

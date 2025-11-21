@@ -1,0 +1,25 @@
+From 9012cad5d91baea4d95a2c5753ead0d5594d4067 Mon Sep 17 00:00:00 2001
+From: Mikolaj Gralczyk <mgralczyk@anaconda.com>
+Date: Fri, 28 Nov 2025 14:02:14 +0100
+Subject: [PATCH] Fix string_view in bracket operator
+
+---
+ plugin/x/tests/driver/processor/send_message_block_processor.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugin/x/tests/driver/processor/send_message_block_processor.cc b/plugin/x/tests/driver/processor/send_message_block_processor.cc
+index 87ae1e1e..3a9b0770 100644
+--- a/plugin/x/tests/driver/processor/send_message_block_processor.cc
++++ b/plugin/x/tests/driver/processor/send_message_block_processor.cc
+@@ -160,7 +160,7 @@ std::string Send_message_block_processor::message_serialize(
+ #endif
+ 
+   res[4] = client_msgs_by_name
+-               [client_msgs_by_full_name[message.GetDescriptor()->full_name()]]
++               [client_msgs_by_full_name[std::string(message.GetDescriptor()->full_name())]]
+                    .second;
+   res.append(out);
+ 
+-- 
+2.50.1 (Apple Git-155)
+
