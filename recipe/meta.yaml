@@ -44,7 +44,7 @@ source:
     - patches/0031-Fix-string_view-in-bracket-operator.patch
 
 build:
-  number: 4
+  number: 5
 
 requirements:
   build:
@@ -293,13 +293,13 @@ outputs:
 
 
 about:
-  home: https://www.mysql.com/
+  home: https://www.mysql.com
   license: GPL-2.0-or-later
   license_family: GPL
   license_file: LICENSE
   summary: Open source relational database management system.
-  dev_url: https://dev.mysql.com/
-  doc_url: https://dev.mysql.com/doc/
+  dev_url: https://dev.mysql.com
+  doc_url: https://dev.mysql.com/doc
 
   description: |
     The MySQL(TM) software delivers a very fast, multi-threaded, multi-user,
