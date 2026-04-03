@@ -2,7 +2,7 @@ anaconda_config_version: 1
 upstream_sources:
   - webpage:
       url: https://dev.mysql.com/downloads/mysql/
-      regex: (?:.*)mysql-(.*)-winx64\.zip
+      regex: mysql-([\d.]+)-[A-Za-z0-9_-]+\.tar\.gz
     packages:
       - mysql
       - mysql-client
