@@ -3,7 +3,7 @@ upstream_sources:
   - github:
       identifier: mysql/mysql-server
       use_max_tag: true
-      strip_prefix: mysql-
+      prefix: mysql-
     packages:
       - mysql
       - mysql-client
