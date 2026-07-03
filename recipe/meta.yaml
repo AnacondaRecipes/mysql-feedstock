@@ -119,6 +119,7 @@ outputs:
       host:
         - libedit {{ libedit }}  # [unix]
         - openssl {{ openssl }}
+        - libprotobuf {{ libprotobuf }}
         - zlib {{ zlib }}
         - zstd {{ zstd }}
         - {{ pin_subpackage('mysql-common', exact=True) }}
