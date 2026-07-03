@@ -1,13 +1,14 @@
-{% set version = "9.3.0" %}
+{% set version = "9.7.0" %}
+{% set name = "MySQL" %}
 {% set major_minor = ".".join(version.split(".")[:2]) %}
 
 package:
-  name: mysql-suite
+  name: {{ name|lower }}-suite
   version: {{ version }}
 
 source:
-  url: https://cdn.mysql.com/Downloads/MySQL-{{ major_minor }}/mysql-{{ version }}.tar.gz
-  sha256: 1a3ee236f1daac5ef897c6325c9b0e0aae486389be1b8001deb3ff77ce682d60
+  url: https://cdn.mysql.com/Downloads/{{name}}-{{ major_minor }}/{{ name|lower }}-{{ version }}.tar.gz
+  sha256: 74b574babc56b0ecb632abd359d213c6794ecf442ae44928bfc581fb3d62306d
   patches:
     - patches/0001-Make-installation-of-pdb-files-optional.patch
     - patches/0002-Fix-file-path-for-mysqlrouter.conf.sample-for-instal.patch
@@ -25,26 +26,17 @@ source:
     - patches/0014-Revert-Bug-30981914-COMPILE-WITH-FASTER-TLS-MODEL.patch
     - patches/0015-Zlib-module-use-macro-instead-of-function.patch
     - patches/0016-Make-get_relative_path-binary-patching-friendly.patch
-    ## Avoid crash on ppc64le, aarch64
-    - patches/0017-Revert-BUG-34849343-Aligned_atomic-not-working-as-in.patch
-    - patches/0018-Make-libfido-checks-conditional.patch
-    - patches/0019-Don-t-include-headers-from-Homebrew.patch
-    - patches/0020-Use-config-mode-search-for-protobuf-first.patch
-    - patches/0021-Simplify-protobuf-deps-using-cmake-alias.patch
-    - patches/0022-Set-PROTOBUF_INCLUDE_DIR-only-if-not-set.patch
-    - patches/0023-Allow-setting-WITH_SASL-none.patch
-    - patches/0024-Dump-std-out-err-if-abi-check-fails.patch
-    - patches/0025-Remove-unsupported-flag-from-macos-linker.patch
-    # Protobuf 6 related patches
-    - patches/0026-Explicit-convert-to-string.patch
-    - patches/0027-Declare-gint64-as-int64_t.patch
-    - patches/0028-Fix-printouts.patch
-    - patches/0029-Fix-string-concatenation-issues.patch
-    - patches/0030-Fix-string_view-conversion-issues.patch
-    - patches/0031-Fix-string_view-in-bracket-operator.patch
+    - patches/0017-Make-libfido-checks-conditional.patch
+    - patches/0018-Don-t-include-headers-from-Homebrew.patch
+    - patches/0019-Use-config-mode-search-for-protobuf-first.patch
+    - patches/0020-Simplify-protobuf-deps-using-cmake-alias.patch
+    - patches/0021-Set-PROTOBUF_INCLUDE_DIR-only-if-not-set.patch
+    - patches/0022-Allow-setting-WITH_SASL-none.patch
+    - patches/0023-Dump-std-out-err-if-abi-check-fails.patch
+    - patches/0024-Add-missing-cstdlib-includes.patch
 
 build:
-  number: 6
+  number: 0
 
 requirements:
   build:
