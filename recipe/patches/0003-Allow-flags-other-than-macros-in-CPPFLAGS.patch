@@ -1,17 +1,17 @@
-From f9c67dfa511d46211d1d1822d63d78ce6d7aff02 Mon Sep 17 00:00:00 2001
+From 0004a4572080c13ebc8dae4d508db331e60fd805 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Mon, 22 Jun 2020 09:53:55 -0400
-Subject: [PATCH 03/23] Allow flags other than macros in CPPFLAGS
+Subject: [PATCH 03/24] Allow flags other than macros in CPPFLAGS
 
 ---
  CMakeLists.txt | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8e0eb67f778..348863c9ad3 100644
+index 86a1e2b8..dc84f811 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -676,7 +676,9 @@ ENDFOREACH()
+@@ -691,7 +691,9 @@ ENDFOREACH()
  # Following autotools tradition, add preprocessor definitions
  # specified in environment variable CPPFLAGS
  IF(DEFINED ENV{CPPFLAGS})
@@ -21,7 +21,4 @@ index 8e0eb67f778..348863c9ad3 100644
 +  ADD_COMPILE_OPTIONS(${CPPFLAGS})
  ENDIF()
  
- INCLUDE(CheckTypeSize)
--- 
-2.49.0
-
+ # To add c/c++ code specific for MySQL AI release using #ifdef..#endif
