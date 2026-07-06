@@ -58,6 +58,7 @@ requirements:
   host:
     - icu {{ icu }}
     - libabseil {{ libabseil }}
+    - libcurl {{ libcurl }}  # [linux]
     - libedit {{ libedit }}  # [unix]
     - libprotobuf {{ libprotobuf }}
     - libtirpc 1.3.7 # [linux]
