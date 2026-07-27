@@ -36,7 +36,7 @@ source:
     - patches/0024-Add-missing-cstdlib-includes.patch
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -49,7 +49,7 @@ requirements:
     - msys2-bison              # [win]
     - pkg-config
     - icu                      # [osx and arm64]
-    - libprotobuf              # [osx and arm64]
+    - libprotobuf 7.35.1              # [osx and arm64]
     - openssl                  # [osx and arm64]
     - zlib                     # [osx and arm64]
     - zstd                     # [osx and arm64]
@@ -57,10 +57,10 @@ requirements:
     - rpcsvc-proto             # [linux]
   host:
     - icu {{ icu }}
-    - libabseil {{ libabseil }}
+    - libabseil 20260526.0
     - libcurl {{ libcurl }}  # [linux]
     - libedit {{ libedit }}  # [unix]
-    - libprotobuf {{ libprotobuf }}
+    - libprotobuf 7.35.1
     - libtirpc 1.3.7 # [linux]
     - lz4-c {{ lz4_c }}
     - openldap {{ openldap }}  # [unix]
@@ -85,9 +85,9 @@ outputs:
         - ninja-base
       host:
         - icu {{ icu }}
-        - libabseil {{ libabseil }}
+        - libabseil 20260526.0
         - libcurl {{ libcurl }}  # [linux]
-        - libprotobuf {{ libprotobuf }}
+        - libprotobuf 7.35.1
         - libtirpc 1.3.7 # [linux]
         - lz4-c {{ lz4_c }}
         - openldap {{ openldap }}  # [unix]
@@ -121,7 +121,7 @@ outputs:
       host:
         - libedit {{ libedit }}  # [unix]
         - openssl {{ openssl }}
-        - libprotobuf {{ libprotobuf }}
+        - libprotobuf 7.35.1
         - libcurl {{ libcurl }}  # [linux]
         - zlib {{ zlib }}
         - zstd {{ zstd }}
@@ -237,7 +237,7 @@ outputs:
         - ninja-base
       host:
         - icu {{ icu }}
-        - libprotobuf {{ libprotobuf }}
+        - libprotobuf 7.35.1
         - lz4-c {{ lz4_c }}
         - openssl {{ openssl }}
         - zlib {{ zlib }}
