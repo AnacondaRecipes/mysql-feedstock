@@ -34,9 +34,11 @@ source:
     - patches/0022-Allow-setting-WITH_SASL-none.patch
     - patches/0023-Dump-std-out-err-if-abi-check-fails.patch
     - patches/0024-Add-missing-cstdlib-includes.patch
+    - patches/0025-Use-arm64-suffix-for-OpenSSL-DLLs-on-win-arm64.patch
+    - patches/0026-Fix-Windows-ARM64-x86-only-intrinsics-in-InnoDB.patch
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
