@@ -305,6 +305,13 @@ about:
 
 
 extra:
+  skip-lints:
+    # linter renders the {{ major_minor }} jinja expression literally, so it probes a
+    # bogus URL; the real URL is reachable and its sha256 is verified against upstream
+    - reachable_url
+    # duplicate /outputs/*/script keys are the standard unix/win script-selection
+    # idiom; ALLOW_DUPLICATE_KEYS is enabled and conda-build applies the selector
+    - parsing_failure
   recipe-maintainers:
     - beckermr
     - nehaljwani
