@@ -1,4 +1,4 @@
-{% set version = "9.7.0" %}
+{% set version = "9.7.2" %}
 {% set name = "MySQL" %}
 {% set major_minor = ".".join(version.split(".")[:2]) %}
 
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://cdn.mysql.com/Downloads/{{name}}-{{ major_minor }}/{{ name|lower }}-{{ version }}.tar.gz
-  sha256: 74b574babc56b0ecb632abd359d213c6794ecf442ae44928bfc581fb3d62306d
+  sha256: e5a676c7cb73738dc6ea33db2093806ebd512b629a139b897fcab68fcd81aaa4
   patches:
     - patches/0001-Make-installation-of-pdb-files-optional.patch
     - patches/0002-Fix-file-path-for-mysqlrouter.conf.sample-for-instal.patch
@@ -36,7 +36,7 @@ source:
     - patches/0024-Add-missing-cstdlib-includes.patch
 
 build:
-  number: 1
+  number: 0
 
 requirements:
   build:
