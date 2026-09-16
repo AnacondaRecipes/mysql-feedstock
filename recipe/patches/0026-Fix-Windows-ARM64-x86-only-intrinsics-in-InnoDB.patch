@@ -1,0 +1,69 @@
+From 1eb8bcb1fa6a0e278b9f8d5d83110e324beabae9 Mon Sep 17 00:00:00 2001
+From: Eric Lundby <elundby@anaconda.com>
+Date: Tue, 15 Sep 2026 21:00:00 +0000
+Subject: [PATCH 26/26] Fix Windows ARM64 build: x86-only intrinsics in InnoDB
+
+On Windows ARM64 (MSVC defines _M_ARM64, and _WIN64) two guards wrongly
+select x86 code, breaking every InnoDB translation unit:
+
+- os0atomic.h: HAVE_WINDOWS_MM_FENCE is added for every MSVC build
+  (storage/innobase/innodb.cmake), so <mmintrin.h> got included and
+  _mm_lfence()/_mm_sfence() were used. Those are x86 only and fail with
+  "fatal error C1189: This header is specific to X86, X64, ARM64, and
+  ARM64EC targets". Restrict the fence branch to x86 and provide a real
+  __dmb() barrier on ARM64 instead of falling through to no barrier.
+
+- ut0crc32.h: "defined(__GNUC__) && defined(__x86_64__) || defined(_WIN32)"
+  parses as "(A && B) || _WIN32", so any Windows build took the
+  CRC32_x86_64 path and pulled in <nmmintrin.h>/<wmmintrin.h>. Require an
+  x86 target for that path, letting MSVC ARM64 use CRC32_DEFAULT.
+---
+ storage/innobase/include/os0atomic.h | 9 ++++++++-
+ storage/innobase/include/ut0crc32.h  | 3 ++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/storage/innobase/include/os0atomic.h b/storage/innobase/include/os0atomic.h
+index e97f2c3..41d5f0a 100644
+--- a/storage/innobase/include/os0atomic.h
++++ b/storage/innobase/include/os0atomic.h
+@@ -65,7 +65,8 @@
+ #define IB_MEMORY_BARRIER_STARTUP_MSG \
+   "Solaris memory ordering functions are used for memory barrier"
+ 
+-#elif defined(HAVE_WINDOWS_MM_FENCE) && defined(_WIN64)
++#elif defined(HAVE_WINDOWS_MM_FENCE) && defined(_WIN64) && \
++    (defined(_M_X64) || defined(_M_IX86))
+ #define HAVE_MEMORY_BARRIER
+ #include <mmintrin.h>
+ #define os_rmb _mm_lfence()
+@@ -73,6 +74,13 @@
+ #define IB_MEMORY_BARRIER_STARTUP_MSG \
+   "_mm_lfence() and _mm_sfence() are used for memory barrier"
+ 
++#elif defined(_M_ARM64) || defined(_M_ARM64EC)
++#define HAVE_MEMORY_BARRIER
++#include <arm64intr.h>
++#define os_rmb __dmb(_ARM64_BARRIER_SY)
++#define os_wmb __dmb(_ARM64_BARRIER_SY)
++#define IB_MEMORY_BARRIER_STARTUP_MSG "__dmb() is used for memory barrier"
++
+ #else
+ #define os_rmb
+ #define os_wmb
+diff --git a/storage/innobase/include/ut0crc32.h b/storage/innobase/include/ut0crc32.h
+index 5a3c1b7..6b2e9d4 100644
+--- a/storage/innobase/include/ut0crc32.h
++++ b/storage/innobase/include/ut0crc32.h
+@@ -50,7 +50,8 @@
+   - do you need the variant with swapped byte order?
+ */
+ 
+-#if defined(__GNUC__) && defined(__x86_64__) || defined(_WIN32)
++#if (defined(_WIN32) && (defined(_M_X64) || defined(_M_IX86))) || \
++    (defined(__GNUC__) && defined(__x86_64__))
+ #define CRC32_x86_64
+ #ifdef _WIN32
+ #define CRC32_x86_64_WIN
+-- 
+2.39.5
+
