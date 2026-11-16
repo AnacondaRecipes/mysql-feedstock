@@ -27,6 +27,7 @@ cmake -S$SRC_DIR -Bbuild -GNinja ${CMAKE_ARGS} \
   -DWITH_PROTOBUF=system \
   -DWITH_KERBEROS=none \
   -DWITH_FIDO=none \
+  -DWITH_AUTHENTICATION_WEBAUTHN=OFF \
   -DWITH_SASL=none \
   -DPROTOBUF_INCLUDE_DIR=${PREFIX}/include \
   -DDEFAULT_CHARSET=utf8mb4 \
